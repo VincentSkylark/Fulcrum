@@ -1,0 +1,23 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Implement user authentication",
+      "description": "Add JWT-based authentication system with login and registration endpoints",
+      "status": "pending",
+      "depends_on": [],
+      "steps": [
+        "Set up JWT library and configuration",
+        "Create user database schema",
+        "Implement registration endpoint",
+        "Implement login endpoint",
+        "Add middleware for protected routes"
+      ],
+      "context_files": ["plans/task-1-auth.md", "CLAUDE.md"],
+      "history": [
+        "2026-02-23T10:00:00Z - Task created",
+        "2026-02-23T10:30:00Z - Dependencies identified"
+      ]
+    }
+  ]
+}

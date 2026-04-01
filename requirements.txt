@@ -1,0 +1,3 @@
+# Claude Code SDK for autonomous task execution
+claude-code-sdk
+
