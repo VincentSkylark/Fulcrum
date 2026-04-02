@@ -72,6 +72,88 @@ build/
 *.js.map
 *.d.ts
 
+# .NET
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Oo]ut/
+msbuild.binlog
+msbuild.projectImports.zip
+*.user
+*.suo
+*.cache
+*.dll
+*.pdb
+*.exe
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+*_i.c
+*_p.c
+*_h.h
+*.ncrunchproject
+_NCrunch_*
+
+# NuGet
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nupkg
+*.snupkg
+**/[Aa]rtifacts/*
+*.nuget.props
+*.nuget.targets
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.VisualState.xml
+TestResults.xml
+nunit-*.xml
+coverage.json
+*.coveragexml
+*.trx
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Visual Studio
+.vs/
+*.rsuser
+
+# Rider
+.idea/
+
+# User-specific files
+appsettings.Development.json
+appsettings.Local.json
+
 # Temporary files
 *.tmp
 *.temp

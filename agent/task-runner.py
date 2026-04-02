@@ -213,8 +213,24 @@ def build_task_prompt(task: dict, branch_name: str) -> str:
     if task_context:
         context_section = f"\n## Task Context\n\n{task_context}\n"
 
-    return f"""You are an autonomous coding agent working on a task from the task queue.
+    # Check if this is a .NET backend task
+    is_dotnet = task.get("task_type", "").lower() in ("backend", "be")
+    dotnet_routing = ""
+    if is_dotnet:
+        dotnet_routing = """
+## .NET Agent Routing
 
+This is a .NET backend task. Before starting implementation:
+1. Read the routing table in CLAUDE.md under "Agent Routing"
+2. Match this task's intent to the appropriate agent
+3. Read the agent definition from `dotnet-agents/<agent>.md`
+4. Read each skill listed in the agent's skill map from `dotnet-skills/<skill-name>/SKILL.md`
+5. Apply the agent's instructions and skills throughout this task
+
+"""
+
+    return f"""You are an autonomous coding agent working on a task from the task queue.
+{dotnet_routing}
 ## Project Structure
 - **Source code goes in:** `src/` directory
 - **Tests go in:** `src/` or `tests/` directory

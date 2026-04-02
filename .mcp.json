@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "roslyn": {
+      "type": "stdio",
+      "command": "cwm-roslyn-navigator",
+      "args": [
+        "--solution",
+        "D:/Claude_Projects/Fulcrum/Fulcrum.slnx"
+      ],
+      "env": {}
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    }
+  }
+}

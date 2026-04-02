@@ -1,0 +1,6 @@
+@Fulcrum.API_HostAddress = http://localhost:5100
+
+GET {{Fulcrum.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

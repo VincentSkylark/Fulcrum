@@ -47,5 +47,10 @@
         ]
       }
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "roslyn",
+    "context7",
+    "playwright"
+  ]
 }

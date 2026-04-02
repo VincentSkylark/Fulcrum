@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Fulcrum.API/Fulcrum.API.csproj" />
+    <Project Path="src/Fulcrum.Auth/Fulcrum.Auth.csproj" />
+  </Folder>
+</Solution>

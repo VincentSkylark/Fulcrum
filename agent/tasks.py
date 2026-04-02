@@ -136,6 +136,7 @@ def add_task(
     depends_on: Optional[list[int]] = None,
     steps: Optional[list[str]] = None,
     context_files: Optional[list[str]] = None,
+    task_type: Optional[str] = None,
 ) -> dict:
     """Add a new task to TASKS.json"""
     data = _load_tasks()
@@ -162,6 +163,9 @@ def add_task(
 
     if context_files:
         task["context_files"] = context_files
+
+    if task_type:
+        task["task_type"] = task_type
 
     data["tasks"].append(task)
     _save_tasks(data)
@@ -326,7 +330,7 @@ def update_task(task_id: int, **kwargs) -> Optional[dict]:
                 if not valid:
                     raise ValueError(error)
 
-            allowed_keys = ["title", "description", "steps", "depends_on", "context_files", "status", "branch"]
+            allowed_keys = ["title", "description", "steps", "depends_on", "context_files", "status", "branch", "task_type"]
             for key, value in kwargs.items():
                 if key in allowed_keys:
                     if key == "status" and value not in VALID_STATUSES:
@@ -352,6 +356,7 @@ if __name__ == "__main__":
     add_parser.add_argument("--depends-on", "-D", type=int, nargs="*", default=[], help="Task IDs this depends on")
     add_parser.add_argument("--steps", "-s", nargs="*", default=[], help="Task steps")
     add_parser.add_argument("--context-files", "-c", nargs="*", default=[], help="File paths to include as context")
+    add_parser.add_argument("--task-type", "-T", default=None, help="Task type (e.g., 'backend', 'BE', 'frontend', 'FE')")
 
     # status
     status_parser = subparsers.add_parser("status", help="Set task status")
@@ -389,6 +394,7 @@ if __name__ == "__main__":
             depends_on=args.depends_on,
             steps=args.steps,
             context_files=args.context_files,
+            task_type=args.task_type,
         )
         print(json.dumps(task, indent=2))
 
