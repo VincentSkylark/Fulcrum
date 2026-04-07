@@ -8,16 +8,61 @@ This is a .NET 10 modular monolith with each module using its own internal archi
 
 - **.NET 10** / C# 14
 - **ASP.NET Core Minimal APIs** — `IEndpointGroup` per feature with `app.MapEndpoints()` auto-discovery, one endpoint group per feature per module
-- **Entity Framework Core** — one DbContext per module, PostgreSQL/SQL Server
-- **Wolverine** — inter-module messaging via integration events, transactional outbox
-- **Mediator** (source-generated, MIT) or Wolverine or raw handlers — intra-module command/query dispatch
+- **Entity Framework Core** — one DbContext per module, shared PostgreSQL instance (`app_db`) with schema-per-module isolation
+- **Hangfire** — background jobs, scheduled tasks, recurring fetchers
+- **TBD** — inter-module messaging via integration events (evaluating Wolverine, MediatR, custom)
 - **FluentValidation** — request validation
 - **Serilog** — structured logging
 - **xUnit v3** + **Testcontainers** — testing
 
 ## Architecture
 
-Run the `architecture-advisor` skill per module to choose between VSA, Clean Architecture, or DDD. Module conventions are defined in the `project-structure`, `vertical-slice`, `messaging`, and `ef-core` skills.
+Run the `architecture-advisor` skill per module to choose between VSA, Clean Architecture, or DDD. Module conventions are defined in the `project-structure`, `vertical-slice`, and `ef-core` skills.
+
+### Module Project Layout
+
+```
+src/
+├── Fulcrum.API/              # Host — middleware, DI wiring, MapEndpoints()
+├── Fulcrum.Auth/             # Kratos integration, profile, session
+├── Fulcrum.News/             # Ingestion, dedup, categorization, search
+├── Fulcrum.Recommendations/  # Vectors, embeddings, personalization
+├── Fulcrum.Billing/          # Payment, subscriptions, entitlements
+├── Fulcrum.Notifications/    # Push, email, digests, delivery tracking
+├── Fulcrum.Analytics/        # Engagement tracking, metrics
+├── Fulcrum.Admin/            # Dashboard, moderation, source management
+└── Fulcrum.Shared/           # Contracts, integration events, shared utilities
+```
+
+### Database Isolation
+
+Each module owns its data through a dedicated DbContext. All modules share a single PostgreSQL instance (`app_db`) with schema-per-module isolation (e.g., `news.Articles`, `billing.Subscriptions`). No module queries another module's schema. Cross-module data flows through integration events only.
+
+### Cross-Module Communication
+
+Modules communicate through self-defined contracts (interfaces + DTOs) in `Fulcrum.Shared`. No generic mediator commands or shared service locator patterns. Each module defines the events it publishes and the handlers it expects as explicit contracts.
+
+```csharp
+// Fulcrum.Shared — contract defined by the publishing module
+public interface IArticlePublishedEvent
+{
+    Guid ArticleId { get; }
+    string Title { get; }
+    DateTimeOffset PublishedAt { get; }
+}
+
+// Fulcrum.Notifications — handler in the consuming module
+public sealed class SendPushOnArticlePublished(IPushService push) : IArticlePublishedEvent
+{
+    // implementation
+}
+```
+
+Rules:
+- Contracts are interfaces + DTOs only — never business logic
+- Publishing module defines the contract; consuming modules implement it
+- No direct project references between feature modules (only `Fulcrum.Shared`)
+- Concrete event dispatch mechanism (in-process bus, Wolverine, etc.) TBD
 
 ## Agent Routing
 
@@ -75,24 +120,24 @@ Read `modern-csharp` first for every agent, then load the domain-specific skills
 dotnet build
 
 # Run the host (development)
-dotnet run --project src/[ProjectName].Host
+dotnet run --project src/Fulcrum.API
 
 # Run all tests
 dotnet test
 
 # Run tests for a specific module
-dotnet test tests/Modules/[ProjectName].Modules.[Module].Tests
+dotnet test tests/Fulcrum.[Module].Tests
 
 # Add EF migration for a specific module
 dotnet ef migrations add [Name] \
-  --project src/Modules/[Module]/[ProjectName].Modules.[Module] \
-  --startup-project src/[ProjectName].Host \
+  --project src/Fulcrum.[Module] \
+  --startup-project src/Fulcrum.API \
   --context [Module]DbContext
 
 # Apply migrations for a specific module
 dotnet ef database update \
-  --project src/Modules/[Module]/[ProjectName].Modules.[Module] \
-  --startup-project src/[ProjectName].Host \
+  --project src/Fulcrum.[Module] \
+  --startup-project src/Fulcrum.API \
   --context [Module]DbContext
 
 # Format check

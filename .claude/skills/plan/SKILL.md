@@ -40,10 +40,12 @@ Use Context7 MCP tools for library documentation lookup:
 
 ### Phase 2: Analysis
 
-1. Check CLAUDE.md for project structure and conventions
-2. Check TASKS.json for existing/overlapping tasks
-3. For library-related tasks, use Context7 MCP tools for documentation lookup
-4. Explore codebase only if needed for context
+1. Read `workflow/STATE.md` to identify the active phase and prior decisions
+2. Read `workflow/ROADMAP.md` to get the active phase's requirements and verify tasks will cover them
+3. Check CLAUDE.md for project structure and conventions
+4. Check TASKS.json for existing/overlapping tasks
+5. For library-related tasks, use Context7 MCP tools for documentation lookup
+6. Explore codebase only if needed for context
 
 ### Phase 3: Task Breakdown
 
@@ -153,7 +155,7 @@ python3 agent/tasks.py add \
 
 The `--context-files` option is optional but recommended for complex tasks. Include plan files, API specs, or reference code.
 
-### Phase 5b: Update Phase Files
+### Phase 5b: Update State
 
 After creating tasks in TASKS.json, update `workflow/STATE.md` with task mappings:
 
@@ -163,10 +165,6 @@ After creating tasks in TASKS.json, update `workflow/STATE.md` with task mapping
   - Description: [Brief description]
   - Status: Pending
 ```
-
-Also check `workflow/ROADMAP.md`:
-- Verify tasks are linked to the appropriate phase
-- Add new requirements if the plan introduces new capabilities
 
 Show created task IDs when done.
 
