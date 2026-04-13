@@ -10,4 +10,15 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Fulcrum.Core\Fulcrum.Core.csproj" />
+    <ProjectReference Include="..\Fulcrum.Auth\Fulcrum.Auth.csproj" />
+    <ProjectReference Include="..\Fulcrum.News\Fulcrum.News.csproj" />
+    <ProjectReference Include="..\Fulcrum.Recommendations\Fulcrum.Recommendations.csproj" />
+    <ProjectReference Include="..\Fulcrum.Billing\Fulcrum.Billing.csproj" />
+    <ProjectReference Include="..\Fulcrum.Notifications\Fulcrum.Notifications.csproj" />
+    <ProjectReference Include="..\Fulcrum.Analytics\Fulcrum.Analytics.csproj" />
+    <ProjectReference Include="..\Fulcrum.Admin\Fulcrum.Admin.csproj" />
+  </ItemGroup>
+
 </Project>
