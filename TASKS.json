@@ -1,3 +1,88 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Create class library projects",
+      "description": "Create 7 new class library projects under src/: Fulcrum.Core (framework abstractions + contracts), Fulcrum.News, Fulcrum.Recommendations, Fulcrum.Billing, Fulcrum.Notifications, Fulcrum.Analytics, Fulcrum.Admin. Delete auto-generated Class1.cs from each. Delete empty src/Fulcrum/ leftover directory.",
+      "status": "pending",
+      "depends_on": [],
+      "steps": [
+        "dotnet new classlib -n Fulcrum.Core -o src/Fulcrum.Core",
+        "dotnet new classlib -n Fulcrum.News -o src/Fulcrum.News",
+        "dotnet new classlib -n Fulcrum.Recommendations -o src/Fulcrum.Recommendations",
+        "dotnet new classlib -n Fulcrum.Billing -o src/Fulcrum.Billing",
+        "dotnet new classlib -n Fulcrum.Notifications -o src/Fulcrum.Notifications",
+        "dotnet new classlib -n Fulcrum.Analytics -o src/Fulcrum.Analytics",
+        "dotnet new classlib -n Fulcrum.Admin -o src/Fulcrum.Admin",
+        "Delete Class1.cs from all new projects",
+        "Delete empty src/Fulcrum/ leftover directory"
+      ],
+      "history": [],
+      "task_type": "backend"
+    },
+    {
+      "id": 2,
+      "title": "Register projects in Fulcrum.slnx",
+      "description": "Add all 7 new projects to the existing Fulcrum.slnx solution file. Verify all 9 projects are listed.",
+      "status": "pending",
+      "depends_on": [
+        1
+      ],
+      "steps": [
+        "dotnet sln Fulcrum.slnx add src/Fulcrum.Core/Fulcrum.Core.csproj src/Fulcrum.News/Fulcrum.News.csproj src/Fulcrum.Recommendations/Fulcrum.Recommendations.csproj src/Fulcrum.Billing/Fulcrum.Billing.csproj src/Fulcrum.Notifications/Fulcrum.Notifications.csproj src/Fulcrum.Analytics/Fulcrum.Analytics.csproj src/Fulcrum.Admin/Fulcrum.Admin.csproj",
+        "Verify with dotnet sln Fulcrum.slnx list"
+      ],
+      "history": [],
+      "task_type": "backend"
+    },
+    {
+      "id": 3,
+      "title": "Wire up project references",
+      "description": "Set up dependency graph: each module references Fulcrum.Core; Fulcrum.API references all modules + Core; no cross-module references.",
+      "status": "pending",
+      "depends_on": [
+        2
+      ],
+      "steps": [
+        "Add Fulcrum.Core reference to each module (Auth, News, Recommendations, Billing, Notifications, Analytics, Admin) using dotnet add reference",
+        "Add all module references + Core to Fulcrum.API",
+        "Verify no circular refs with dotnet build"
+      ],
+      "history": [],
+      "task_type": "backend"
+    },
+    {
+      "id": 4,
+      "title": "Set up central package management",
+      "description": "Create Directory.Packages.props with ManagePackageVersionsCentrally. Migrate existing package versions from individual .csproj files into central props.",
+      "status": "pending",
+      "depends_on": [
+        1
+      ],
+      "steps": [
+        "Create Directory.Packages.props with ManagePackageVersionsCentrally=true",
+        "Migrate Microsoft.AspNetCore.OpenApi 10.0.5 from Fulcrum.API.csproj into central props",
+        "Remove Version= from PackageReference in Fulcrum.API.csproj",
+        "Verify dotnet build succeeds"
+      ],
+      "history": [],
+      "task_type": "backend"
+    },
+    {
+      "id": 5,
+      "title": "Clean up Fulcrum.API Program.cs",
+      "description": "Remove default weather forecast boilerplate from Program.cs. Leave clean minimal host with builder, app, and Run only.",
+      "status": "pending",
+      "depends_on": [
+        2
+      ],
+      "steps": [
+        "Replace Program.cs content with clean minimal host (WebApplication.CreateBuilder, builder.Build, app.Run)",
+        "Remove WeatherForecast record",
+        "Verify dotnet build succeeds"
+      ],
+      "history": [],
+      "task_type": "backend"
+    }
+  ]
 }

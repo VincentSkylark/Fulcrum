@@ -8,7 +8,25 @@
 
 ## Current Phase Tasks
 
-- No tasks created yet — run `/plan` to break Phase 1 into tasks
+- **Task 1:** Create class library projects
+  - Description: 7 new classlib projects (Core, News, Recommendations, Billing, Notifications, Analytics, Admin)
+  - Status: Pending
+- **Task 2:** Register projects in Fulcrum.slnx
+  - Description: Add 7 new projects to existing .slnx
+  - Status: Pending
+  - Depends on: Task 1
+- **Task 3:** Wire up project references
+  - Description: Module → Core; API → all modules + Core; no cross-module refs
+  - Status: Pending
+  - Depends on: Task 2
+- **Task 4:** Set up central package management
+  - Description: Create Directory.Packages.props, migrate versions
+  - Status: Pending
+  - Depends on: Task 1
+- **Task 5:** Clean up Fulcrum.API Program.cs
+  - Description: Remove weather forecast boilerplate
+  - Status: Pending
+  - Depends on: Task 2
 
 ## Decisions
 
