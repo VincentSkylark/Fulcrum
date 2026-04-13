@@ -11,14 +11,14 @@ Fulcrum is a SaaS news push platform that ingests news from multiple sources, pe
 ```
 src/
 ├── Fulcrum.API/              # API host, middleware, DI wiring
+├── Fulcrum.Core/             # Framework abstractions, contracts, integration events
 ├── Fulcrum.Auth/             # Kratos integration, profile, session
 ├── Fulcrum.News/             # Ingestion, dedup, categorization, search, storage
 ├── Fulcrum.Recommendations/  # Vectors, embeddings, personalization
 ├── Fulcrum.Billing/          # Payment, subscriptions, entitlements
 ├── Fulcrum.Notifications/    # Push, email, digests, delivery tracking
 ├── Fulcrum.Analytics/        # Engagement tracking, metrics
-├── Fulcrum.Admin/            # Dashboard, moderation, source management
-└── Fulcrum.Shared/           # Contracts, integration events, shared utilities
+└── Fulcrum.Admin/            # Dashboard, moderation, source management
 ```
 
 ## Infrastructure (Docker Compose — dev)
@@ -42,7 +42,7 @@ services:
 - **Goal:** Establish solution structure, infrastructure, and developer experience baseline
 - **Status:** Not Started
 - **Requirements:**
-  - FND-01: Solution file (.sln) + project structure with all 9 projects
+  - FND-01: Solution file (.slnx) + project structure with all 9 projects (Core replaces Shared)
   - FND-02: `Directory.Packages.props` for central package management
   - FND-03: Dockerfile + docker-compose.yml for local development
   - FND-04: PostgreSQL setup (app_db + kratos_db)

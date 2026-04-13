@@ -24,14 +24,14 @@ Run the `architecture-advisor` skill per module to choose between VSA, Clean Arc
 ```
 src/
 ├── Fulcrum.API/              # Host — middleware, DI wiring, MapEndpoints()
+├── Fulcrum.Core/             # Framework abstractions, contracts, integration events
 ├── Fulcrum.Auth/             # Kratos integration, profile, session
 ├── Fulcrum.News/             # Ingestion, dedup, categorization, search
 ├── Fulcrum.Recommendations/  # Vectors, embeddings, personalization
 ├── Fulcrum.Billing/          # Payment, subscriptions, entitlements
 ├── Fulcrum.Notifications/    # Push, email, digests, delivery tracking
 ├── Fulcrum.Analytics/        # Engagement tracking, metrics
-├── Fulcrum.Admin/            # Dashboard, moderation, source management
-└── Fulcrum.Shared/           # Contracts, integration events, shared utilities
+└── Fulcrum.Admin/            # Dashboard, moderation, source management
 ```
 
 ### Database Isolation
@@ -40,10 +40,10 @@ Each module owns its data through a dedicated DbContext. All modules share a sin
 
 ### Cross-Module Communication
 
-Modules communicate through self-defined contracts (interfaces + DTOs) in `Fulcrum.Shared`. No generic mediator commands or shared service locator patterns. Each module defines the events it publishes and the handlers it expects as explicit contracts.
+Modules communicate through self-defined contracts (interfaces + DTOs) in `Fulcrum.Core`. No generic mediator commands or shared service locator patterns. Each module defines the events it publishes and the handlers it expects as explicit contracts.
 
 ```csharp
-// Fulcrum.Shared — contract defined by the publishing module
+// Fulcrum.Core — contract defined by the publishing module
 public interface IArticlePublishedEvent
 {
     Guid ArticleId { get; }
@@ -51,7 +51,7 @@ public interface IArticlePublishedEvent
     DateTimeOffset PublishedAt { get; }
 }
 
-// Fulcrum.Notifications — handler in the consuming module
+// Fulcrum.Notifications — handler in the consuming module (reference to Fulcrum.Core only)
 public sealed class SendPushOnArticlePublished(IPushService push) : IArticlePublishedEvent
 {
     // implementation
@@ -61,7 +61,7 @@ public sealed class SendPushOnArticlePublished(IPushService push) : IArticlePubl
 Rules:
 - Contracts are interfaces + DTOs only — never business logic
 - Publishing module defines the contract; consuming modules implement it
-- No direct project references between feature modules (only `Fulcrum.Shared`)
+- No direct project references between feature modules (only `Fulcrum.Core`)
 - Concrete event dispatch mechanism (in-process bus, Wolverine, etc.) TBD
 
 ## Agent Routing
