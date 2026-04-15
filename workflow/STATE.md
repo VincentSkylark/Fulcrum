@@ -2,31 +2,17 @@
 
 ## Current Position
 
-- **Active Phase:** Phase 1: Foundation
-- **Last Completed:** None
+- **Active Phase:** Phase 1: Foundation (Completed)
+- **Last Completed:** Phase 1: Foundation (2026-04-13)
 - **Date:** 2026-04-06
 
 ## Current Phase Tasks
 
-- **Task 1:** Create class library projects
-  - Description: 7 new classlib projects (Core, News, Recommendations, Billing, Notifications, Analytics, Admin)
-  - Status: Pending
-- **Task 2:** Register projects in Fulcrum.slnx
-  - Description: Add 7 new projects to existing .slnx
-  - Status: Pending
-  - Depends on: Task 1
-- **Task 3:** Wire up project references
-  - Description: Module → Core; API → all modules + Core; no cross-module refs
-  - Status: Pending
-  - Depends on: Task 2
-- **Task 4:** Set up central package management
-  - Description: Create Directory.Packages.props, migrate versions
-  - Status: Pending
-  - Depends on: Task 1
-- **Task 5:** Clean up Fulcrum.API Program.cs
-  - Description: Remove weather forecast boilerplate
-  - Status: Pending
-  - Depends on: Task 2
+- **Task 1:** Create class library projects ~~Completed 2026-04-13~~
+- **Task 2:** Register projects in Fulcrum.slnx ~~Completed 2026-04-13~~
+- **Task 3:** Wire up project references ~~Completed 2026-04-13~~
+- **Task 4:** Set up central package management ~~Completed 2026-04-13~~
+- **Task 5:** Clean up Fulcrum.API Program.cs ~~Completed 2026-04-13~~
 
 ## Decisions
 
@@ -75,5 +61,5 @@
 - Phases provide organization, not execution control
 - TASKS.json remains the source of truth for task execution
 - Each phase should be planned with `/plan` before execution begins
-- Fulcrum.Auth project exists but is scaffolding only (placeholder Class1.cs)
-- Fulcrum.API has default template code — needs Foundation phase work
+- Fulcrum.Auth project exists but is scaffolding only (no source files yet)
+- Fulcrum.API has clean minimal host (Program.cs stripped of template code)
