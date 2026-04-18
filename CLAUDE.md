@@ -7,8 +7,9 @@ This is a .NET 10 modular monolith with each module using its own internal archi
 ## Tech Stack
 
 - **.NET 10** / C# 14
+- **.NET Aspire 13** — Application orchestration, service discovery, and local infra management (PostgreSQL, Ory Kratos)
 - **ASP.NET Core Minimal APIs** — `IEndpointGroup` per feature with `app.MapEndpoints()` auto-discovery, one endpoint group per feature per module
-- **Entity Framework Core** — one DbContext per module, shared PostgreSQL instance (`app_db`) with schema-per-module isolation
+- **Entity Framework Core** — one DbContext per module, shared PostgreSQL instance (`app-db`) with schema-per-module isolation
 - **Hangfire** — background jobs, scheduled tasks, recurring fetchers
 - **TBD** — inter-module messaging via integration events (evaluating Wolverine, MediatR, custom)
 - **FluentValidation** — request validation
@@ -23,6 +24,8 @@ Run the `architecture-advisor` skill per module to choose between VSA, Clean Arc
 
 ```
 src/
+├── Fulcrum.AppHost/          # .NET Aspire orchestrator (startup project)
+├── Fulcrum.ServiceDefaults/  # Shared service config (OpenTelemetry, health checks)
 ├── Fulcrum.API/              # Host — middleware, DI wiring, MapEndpoints()
 ├── Fulcrum.Core/             # Framework abstractions, contracts, integration events
 ├── Fulcrum.Auth/             # Kratos integration, profile, session
@@ -36,7 +39,15 @@ src/
 
 ### Database Isolation
 
-Each module owns its data through a dedicated DbContext. All modules share a single PostgreSQL instance (`app_db`) with schema-per-module isolation (e.g., `news.Articles`, `billing.Subscriptions`). No module queries another module's schema. Cross-module data flows through integration events only.
+Each module owns its data through a dedicated DbContext. All modules share a single PostgreSQL instance (`app-db`) with schema-per-module isolation (e.g., `news.Articles`, `billing.Subscriptions`). No module queries another module's schema. Cross-module data flows through integration events only.
+
+### Orchestration & Local Dev
+
+Fulcrum uses **.NET Aspire** to manage dependencies.
+- **Local Dev:** Use `dotnet run --project src/Fulcrum.AppHost` (or F5). This automatically spins up PostgreSQL (with pgAdmin) as containers. Kratos will be added when the Auth module is implemented.
+- **Service Discovery:** Modules resolve Postgres via Aspire connection strings (e.g., `builder.AddNpgsqlDataSource("app-db")`), not hardcoded URLs.
+- **Observability:** Access the Aspire Dashboard for unified logs and OpenTelemetry traces across all modules.
+- **Service Defaults:** All services call `builder.AddServiceDefaults()` and `app.MapDefaultEndpoints()` from the `Fulcrum.ServiceDefaults` project, which configures OpenTelemetry, health checks, and logging in one place.
 
 ### Cross-Module Communication
 
@@ -120,7 +131,7 @@ Read `modern-csharp` first for every agent, then load the domain-specific skills
 dotnet build
 
 # Run the host (development)
-dotnet run --project src/Fulcrum.API
+dotnet run --project src/Fulcrum.AppHost
 
 # Run all tests
 dotnet test
@@ -131,7 +142,7 @@ dotnet test tests/Fulcrum.[Module].Tests
 # Add EF migration for a specific module
 dotnet ef migrations add [Name] \
   --project src/Fulcrum.[Module] \
-  --startup-project src/Fulcrum.API \
+  --startup-project src/Fulcrum.AppHost \
   --context [Module]DbContext
 
 # Apply migrations for a specific module

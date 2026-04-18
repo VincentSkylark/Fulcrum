@@ -11,10 +11,17 @@
       "Task",
       "Skill",
       "mcp__*",
-      "mcp__zread__read_file"
+      "mcp__zread__read_file",
+      "mcp__context7__query-docs",
+      "mcp__context7__resolve-library-id"
     ],
     "deny": []
   },
+  "enabledMcpjsonServers": [
+    "roslyn",
+    "context7",
+    "playwright"
+  ],
   "hooks": {
     "Notification": [
       {
@@ -47,10 +54,5 @@
         ]
       }
     ]
-  },
-  "enabledMcpjsonServers": [
-    "roslyn",
-    "context7",
-    "playwright"
-  ]
+  }
 }

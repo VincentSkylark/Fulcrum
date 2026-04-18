@@ -10,6 +10,8 @@ Fulcrum is a SaaS news push platform that ingests news from multiple sources, pe
 
 ```
 src/
+├── Fulcrum.AppHost/          # .NET Aspire orchestrator (startup project)
+├── Fulcrum.ServiceDefaults/  # Shared service config (OpenTelemetry, health checks)
 ├── Fulcrum.API/              # API host, middleware, DI wiring
 ├── Fulcrum.Core/             # Framework abstractions, contracts, integration events
 ├── Fulcrum.Auth/             # Kratos integration, profile, session
@@ -21,18 +23,21 @@ src/
 └── Fulcrum.Admin/            # Dashboard, moderation, source management
 ```
 
-## Infrastructure (Docker Compose — dev)
+## Infrastructure (.NET Aspire — dev)
 
+Managed by `Fulcrum.AppHost`:
 ```
-services:
-  app:             # .NET monolith
-  kratos:          # identity
-  kratos-migrate:
-  db:              # PostgreSQL + pgvector
-  redis:           # caching + job queues
-  meilisearch:     # full-text search (if not using PG FTS)
-  mailslurper:     # catch emails locally
-  minio:           # S3-compatible local object storage
+postgres:        # PostgreSQL + pgvector (Aspire container)
+pgadmin:         # pgAdmin (Aspire container, dev only)
+api:             # .NET monolith (Fulcrum.API)
+```
+
+Future additions:
+```
+kratos:          # Ory Kratos identity (Phase 2 — Auth)
+redis:           # caching + job queues (Phase 3 — News)
+meilisearch:     # full-text search (Phase 3 — News)
+minio:           # S3-compatible local object storage (Phase 3 — News)
 ```
 
 ---
@@ -42,10 +47,10 @@ services:
 - **Goal:** Establish solution structure, infrastructure, and developer experience baseline
 - **Status:** Completed
 - **Requirements:**
-  - FND-01: Solution file (.slnx) + project structure with all 9 projects (Core replaces Shared)
+  - FND-01: Solution file (.slnx) + project structure with all 11 projects (Core replaces Shared)
   - FND-02: `Directory.Packages.props` for central package management
-  - FND-03: Dockerfile + docker-compose.yml for local development
-  - FND-04: PostgreSQL setup (app_db + kratos_db)
+  - FND-03: `Fulcrum.AppHost` + .NET Aspire 13 for local development orchestration
+  - FND-04: PostgreSQL setup via Aspire (`AddPostgres` + `AddDatabase`)
   - FND-05: Redis for caching and background job queues
   - FND-06: Serilog structured logging to console + file
   - FND-07: Sentry error tracking integration

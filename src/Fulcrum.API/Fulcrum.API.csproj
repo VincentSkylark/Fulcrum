@@ -5,6 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Fulcrum.ServiceDefaults\Fulcrum.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Fulcrum.Core\Fulcrum.Core.csproj" />
     <ProjectReference Include="..\Fulcrum.Auth\Fulcrum.Auth.csproj" />
     <ProjectReference Include="..\Fulcrum.News\Fulcrum.News.csproj" />

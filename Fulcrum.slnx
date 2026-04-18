@@ -3,11 +3,13 @@
     <Project Path="src/Fulcrum.Admin/Fulcrum.Admin.csproj" />
     <Project Path="src/Fulcrum.Analytics/Fulcrum.Analytics.csproj" />
     <Project Path="src/Fulcrum.API/Fulcrum.API.csproj" />
+    <Project Path="src/Fulcrum.AppHost/Fulcrum.AppHost.csproj" />
     <Project Path="src/Fulcrum.Auth/Fulcrum.Auth.csproj" />
     <Project Path="src/Fulcrum.Billing/Fulcrum.Billing.csproj" />
     <Project Path="src/Fulcrum.Core/Fulcrum.Core.csproj" />
     <Project Path="src/Fulcrum.News/Fulcrum.News.csproj" />
     <Project Path="src/Fulcrum.Notifications/Fulcrum.Notifications.csproj" />
     <Project Path="src/Fulcrum.Recommendations/Fulcrum.Recommendations.csproj" />
+    <Project Path="src/Fulcrum.ServiceDefaults/Fulcrum.ServiceDefaults.csproj" />
   </Folder>
 </Solution>
