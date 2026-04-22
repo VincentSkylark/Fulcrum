@@ -13,7 +13,10 @@
       "mcp__*",
       "mcp__zread__read_file",
       "mcp__context7__query-docs",
-      "mcp__context7__resolve-library-id"
+      "mcp__context7__resolve-library-id",
+      "WebSearch",
+      "mcp__web-reader__webReader",
+      "mcp__roslyn__get_diagnostics"
     ],
     "deny": []
   },

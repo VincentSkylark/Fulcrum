@@ -3,8 +3,8 @@
 ## Current Position
 
 - **Active Phase:** Phase 1: Foundation (Completed)
-- **Last Completed:** Phase 1: Foundation (2026-04-13)
-- **Date:** 2026-04-06
+- **Last Completed:** Phase 1: Foundation (2026-04-13) + Fulcrum.Core implementation
+- **Date:** 2026-04-18
 
 ## Current Phase Tasks
 
@@ -33,6 +33,11 @@
 | 2026-04-06 | Schema-per-module in shared app_db | One PostgreSQL instance, each module gets its own schema, no cross-module queries |
 | 2026-04-06 | Self-defined contracts (interfaces + DTOs) for cross-module communication | No generic mediator commands; publishing module defines contract in Fulcrum.Core, consuming modules implement it |
 | 2026-04-17 | .NET Aspire 13 for local dev orchestration | Replaces docker-compose with code-first infra management; service discovery built-in; Aspire dashboard for observability |
+| 2026-04-18 | Custom lightweight event dispatcher (no MediatR/Wolverine) | MediatR is now commercial (license key required); Wolverine lacks .NET 10 target; Core stays dependency-free; Wolverine re-evaluated in Phase 3 if outbox guarantees needed |
+| 2026-04-19 | Wolverine for cross-module integration events | Provides outbox guarantees out of the box; eliminates custom dispatcher; supports future module extraction to separate services; Wolverine referenced only in Fulcrum.API host |
+| 2026-04-18 | Explicit `AddFulcrumXxx()` DI registration, no `IModule` auto-scanning | Explicit is debuggable and transparent; IEndpointGroup handles endpoint auto-discovery only; no hidden assembly scanning for DI |
+| 2026-04-19 | Explicit endpoint registration (`MapFulcrumXxxEndpoints()`) instead of reflection-based auto-discovery | AOT-friendly, no source generator needed, debuggable, consistent with explicit DI philosophy; `IEndpointGroup` and `EndpointDiscovery` removed from Core |
+| 2026-04-18 | `Result<T>` in Core, `IExceptionHandler` in API | Core stays HTTP-agnostic; API owns the Result→ProblemDetails mapping; modules use Result<T> in any context (HTTP, jobs, CLI) |
 
 ## Blockers
 
@@ -42,12 +47,12 @@
 
 - **Runtime:** .NET 10 / C# 14
 - **Orchestration:** .NET Aspire 13 (AppHost + ServiceDefaults)
-- **API:** ASP.NET Core Minimal APIs + IEndpointGroup auto-discovery
+- **API:** ASP.NET Core Minimal APIs + explicit `MapFulcrumXxxEndpoints()` per module
 - **ORM:** Entity Framework Core (one DbContext per module)
 - **Database:** PostgreSQL (app-db + kratos-db) + pgvector
 - **Cache / Queue:** Redis
 - **Background Jobs:** Hangfire
-- **Inter-Module Events:** TBD (Wolverine, MediatR, or custom — decision needed before Phase 3)
+- **Inter-Module Events:** Wolverine (outbox guarantees, in-process dispatch, `IMessageBus`)
 - **Identity:** Ory Kratos
 - **Payments:** Stripe
 - **Search:** Meilisearch (or PostgreSQL FTS)

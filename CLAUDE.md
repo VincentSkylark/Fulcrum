@@ -8,10 +8,10 @@ This is a .NET 10 modular monolith with each module using its own internal archi
 
 - **.NET 10** / C# 14
 - **.NET Aspire 13** — Application orchestration, service discovery, and local infra management (PostgreSQL, Ory Kratos)
-- **ASP.NET Core Minimal APIs** — `IEndpointGroup` per feature with `app.MapEndpoints()` auto-discovery, one endpoint group per feature per module
+- **ASP.NET Core Minimal APIs** — explicit `MapFulcrumXxxEndpoints()` per module, one endpoint group per feature per module
 - **Entity Framework Core** — one DbContext per module, shared PostgreSQL instance (`app-db`) with schema-per-module isolation
 - **Hangfire** — background jobs, scheduled tasks, recurring fetchers
-- **TBD** — inter-module messaging via integration events (evaluating Wolverine, MediatR, custom)
+- **Wolverine** — in-process messaging with outbox guarantees for cross-module integration events
 - **FluentValidation** — request validation
 - **Serilog** — structured logging
 - **xUnit v3** + **Testcontainers** — testing
@@ -51,29 +51,70 @@ Fulcrum uses **.NET Aspire** to manage dependencies.
 
 ### Cross-Module Communication
 
-Modules communicate through self-defined contracts (interfaces + DTOs) in `Fulcrum.Core`. No generic mediator commands or shared service locator patterns. Each module defines the events it publishes and the handlers it expects as explicit contracts.
+Modules communicate through integration events dispatched by **Wolverine**. Event contracts (records implementing `IIntegrationEvent`) are defined in `Fulcrum.Core` by the publishing module. Consuming modules contain Wolverine message handlers that receive these events. Wolverine provides outbox guarantees, ensuring events are dispatched reliably alongside database commits — no custom dispatcher infrastructure needed.
 
 ```csharp
-// Fulcrum.Core — contract defined by the publishing module
-public interface IArticlePublishedEvent
-{
-    Guid ArticleId { get; }
-    string Title { get; }
-    DateTimeOffset PublishedAt { get; }
-}
+// Fulcrum.Core — integration event record defined by the publishing module
+public sealed record ArticlePublishedEvent(
+    Guid ArticleId,
+    string Title,
+    DateTimeOffset PublishedAt,
+    Guid EventId,
+    DateTimeOffset OccurredAt) : IIntegrationEvent;
 
-// Fulcrum.Notifications — handler in the consuming module (reference to Fulcrum.Core only)
-public sealed class SendPushOnArticlePublished(IPushService push) : IArticlePublishedEvent
+// Fulcrum.Notifications — Wolverine message handler in the consuming module
+public sealed class ArticlePublishedHandler(IPushService push)
 {
-    // implementation
+    public async Task HandleAsync(ArticlePublishedEvent notification, CancellationToken ct)
+    {
+        await push.SendAsync(notification.ArticleId, notification.Title, ct);
+    }
 }
 ```
 
 Rules:
-- Contracts are interfaces + DTOs only — never business logic
-- Publishing module defines the contract; consuming modules implement it
+- Event contracts are sealed records in `Fulcrum.Core` — never business logic
+- Publishing module defines the event record; consuming modules define Wolverine handlers
 - No direct project references between feature modules (only `Fulcrum.Core`)
-- Concrete event dispatch mechanism (in-process bus, Wolverine, etc.) TBD
+- `Fulcrum.Core` has zero external NuGet dependencies — Wolverine is referenced only in `Fulcrum.API` (host)
+- Wolverine provides outbox + in-process dispatch; modules use `IMessageBus` to publish
+
+### Module Registration
+
+Each module registers its own services and endpoints through explicit extension methods. Called explicitly in `Fulcrum.API/Program.cs`. No assembly scanning, no reflection, no source generators — explicit is debuggable, transparent, and AOT-friendly.
+
+```csharp
+// Fulcrum.API/Program.cs
+builder.Services.AddFulcrumAuth();
+builder.Services.AddFulcrumNews();
+builder.Services.AddFulcrumBilling();
+
+var app = builder.Build();
+app.MapFulcrumAuthEndpoints();
+app.MapFulcrumNewsEndpoints();
+app.MapFulcrumBillingEndpoints();
+```
+
+Each module's `ServiceCollectionExtensions.cs` contains both the DI registration and endpoint mapping:
+
+```csharp
+// Fulcrum.Auth/ServiceCollectionExtensions.cs
+public static IServiceCollection AddFulcrumAuth(this IServiceCollection services)
+{
+    services.AddScoped<ISessionService, SessionService>();
+    return services;
+}
+
+public static WebApplication MapFulcrumAuthEndpoints(this WebApplication app)
+{
+    new LoginEndpoints().Map(app);
+    new RegisterEndpoints().Map(app);
+    new ProfileEndpoints().Map(app);
+    return app;
+}
+```
+
+Every endpoint group still gets its own file — the only change is how the host discovers them (explicit registration instead of reflection).
 
 ## Agent Routing
 
