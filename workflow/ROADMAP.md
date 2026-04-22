@@ -56,8 +56,8 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
   - FND-07: Sentry error tracking integration
   - FND-08: CI/CD pipeline (build, test, deploy)
   - FND-09: OpenAPI/Swagger documentation
-  - FND-10: `IEndpointGroup` auto-discovery wired in Program.cs
-  - FND-11: Global exception handler (`IExceptionHandler`)
+  - FND-10: Explicit `AddFulcrumXxx()` DI registration and `MapFulcrumXxxEndpoints()` per module in Program.cs (no auto-scanning, no reflection, no source generators)
+  - FND-11: Global exception handler (`IExceptionHandler`) in Fulcrum.API; `Result<T>` error taxonomy in Fulcrum.Core
   - FND-12: Health check endpoints
 - **Tasks:** 1, 2, 3, 4, 5
 

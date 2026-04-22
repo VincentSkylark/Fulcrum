@@ -1,0 +1,68 @@
+# EditorConfig — https://editorconfig.org
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# --- .NET Code Style ---
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/
+
+# File-scoped namespaces
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+# var preferences
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Expression-bodied members
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+
+# Pattern matching
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+
+# Null checking
+csharp_style_throw_expression = true:suggestion
+csharp_style_conditional_delegate_call = true:suggestion
+
+# brace style
+csharp_prefer_braces = true:suggestion
+
+# Unused parameters
+dotnet_code_quality_unused_parameters = all:suggestion
+
+# --- Global Analyzer Suppressions ---
+
+# CA1062: Validate arguments of public methods
+# Redundant with Nullable Reference Types — the compiler covers null-safety at the signature level.
+# Boundary validation (FluentValidation at API edges) handles the rest.
+dotnet_diagnostic.CA1062.severity = none
+
+# CA1305: Specify IFormatProvider
+# Excessively verbose for an internal application. Locale-sensitive formatting
+# will be handled explicitly where needed (e.g., Billing module currency display).
+dotnet_diagnostic.CA1305.severity = none
+
+# CA1822: Make member static
+# Conflicts with DI — instance methods that don't use `this` are still required
+# for constructor-injected dependencies and interface implementations.
+dotnet_diagnostic.CA1822.severity = none
+
+# CS8618: Non-nullable property must contain a non-null value when exiting constructor
+# EF Core initializes these via proxy/reflection. Constructors are not the authority.
+dotnet_diagnostic.CS8618.severity = none
+
+# CA1707: Identifiers should not contain underscores
+# Suppressed in test projects only — test naming uses Method_Scenario_Result convention.
+# Uncomment the section below when test projects are added:
+#
+# [*/tests/**]
+# dotnet_diagnostic.CA1707.severity = none
