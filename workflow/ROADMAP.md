@@ -66,13 +66,17 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 ## Phase 2: Authentication
 
 - **Goal:** User identity, sessions, social login, and GDPR foundations
-- **Status:** Not Started
+- **Status:** In Progress (AUTH-01 to AUTH-04 complete)
 - **Requirements:**
   - AUTH-01: Kratos configuration + identity schema
   - AUTH-02: Session middleware + CurrentUser context
   - AUTH-03: Profile entity + webhooks (registration, settings, deletion)
   - AUTH-04: Auth flow proxy endpoints (login, register, recovery, verification)
   - AUTH-05: Frontend auth pages (login, register, recovery)
+  - AUTH-06: Social sign-in (Google, Facebook, Twitter)
+  - AUTH-07: Account settings page
+  - AUTH-08: GDPR foundations (account deletion, data export endpoint)
+- **Tasks:** 6, 7, 8, 9, 10
   - AUTH-06: Social sign-in (Google, Facebook, Twitter)
   - AUTH-07: Account settings page
   - AUTH-08: GDPR foundations (account deletion, data export endpoint)

@@ -75,6 +75,9 @@ build/
 # .NET Aspire
 .aspire/
 
+# Local dev data persistence
+/data/
+
 # .NET
 bin/
 obj/
@@ -161,3 +164,6 @@ appsettings.Local.json
 *.tmp
 *.temp
 .cache/
+
+# Playwright MCP
+.playwright-mcp/

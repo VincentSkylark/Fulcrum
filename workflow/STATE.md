@@ -2,17 +2,17 @@
 
 ## Current Position
 
-- **Active Phase:** Phase 1: Foundation (Completed)
+- **Active Phase:** Phase 2: Authentication (In Progress)
 - **Last Completed:** Phase 1: Foundation (2026-04-13) + Fulcrum.Core implementation
-- **Date:** 2026-04-18
+- **Date:** 2026-04-22
 
 ## Current Phase Tasks
 
-- **Task 1:** Create class library projects ~~Completed 2026-04-13~~
-- **Task 2:** Register projects in Fulcrum.slnx ~~Completed 2026-04-13~~
-- **Task 3:** Wire up project references ~~Completed 2026-04-13~~
-- **Task 4:** Set up central package management ~~Completed 2026-04-13~~
-- **Task 5:** Clean up Fulcrum.API Program.cs ~~Completed 2026-04-13~~
+- **Task 6:** Kratos infrastructure (Aspire + config) — Completed 2026-04-22
+- **Task 7:** Fulcrum.Auth project setup + Kratos client + AuthDbContext — Completed 2026-04-22
+- **Task 8:** Session middleware + CurrentUserAccessor — Completed 2026-04-22
+- **Task 9:** Auth proxy endpoints — Completed 2026-04-22
+- **Task 10:** Wire everything together — Completed 2026-04-22
 
 ## Decisions
 
@@ -38,6 +38,12 @@
 | 2026-04-18 | Explicit `AddFulcrumXxx()` DI registration, no `IModule` auto-scanning | Explicit is debuggable and transparent; IEndpointGroup handles endpoint auto-discovery only; no hidden assembly scanning for DI |
 | 2026-04-19 | Explicit endpoint registration (`MapFulcrumXxxEndpoints()`) instead of reflection-based auto-discovery | AOT-friendly, no source generator needed, debuggable, consistent with explicit DI philosophy; `IEndpointGroup` and `EndpointDiscovery` removed from Core |
 | 2026-04-18 | `Result<T>` in Core, `IExceptionHandler` in API | Core stays HTTP-agnostic; API owns the Result→ProblemDetails mapping; modules use Result<T> in any context (HTTP, jobs, CLI) |
+| 2026-04-22 | Kratos separate DB (`kratos-db`) on shared PostgreSQL | Same server, isolated data, one Postgres to manage |
+| 2026-04-22 | Self-hosted Kratos from day one | Full control, lower cost, simpler for small team; can evaluate Ory Network later |
+| 2026-04-22 | HttpClient over Ory.Client SDK for Kratos API | SDK had constructor/property mismatches; Kratos REST API is simple enough to call directly; avoids SDK version coupling |
+| 2026-04-22 | Server-driven single POST auth flows | Backend creates + submits Kratos flows; simpler for API clients; no two-step dance |
+| 2026-04-22 | No caching abstraction in Core | Modules use HybridCache directly; extract to Core only if duplication emerges |
+| 2026-04-22 | No IAuditable in Core | Add when a module actually needs it |
 
 ## Blockers
 
@@ -53,7 +59,7 @@
 - **Cache / Queue:** Redis
 - **Background Jobs:** Hangfire
 - **Inter-Module Events:** Wolverine (outbox guarantees, in-process dispatch, `IMessageBus`)
-- **Identity:** Ory Kratos
+- **Identity:** Ory Kratos (self-hosted, v1.3.1)
 - **Payments:** Stripe
 - **Search:** Meilisearch (or PostgreSQL FTS)
 - **Push:** TBD (post-alpha)
@@ -70,5 +76,5 @@
 - Fulcrum.AppHost is the startup project (`dotnet run --project src/Fulcrum.AppHost`)
 - Aspire manages PostgreSQL containers; no docker-compose needed for local dev
 - ServiceDefaults project provides shared OpenTelemetry, health checks, and logging config
-- Kratos container configuration deferred to Phase 2 (Auth) — `kratos/` config directory is empty
-- Fulcrum.API has clean minimal host with Aspire service defaults wired in
+- Kratos container configured in AppHost with bind-mounted config from `kratos/config/`
+- Fulcrum.Auth owns all Kratos communication; other modules use `ICurrentUserAccessor`

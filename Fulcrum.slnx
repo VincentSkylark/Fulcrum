@@ -12,4 +12,7 @@
     <Project Path="src/Fulcrum.Recommendations/Fulcrum.Recommendations.csproj" />
     <Project Path="src/Fulcrum.ServiceDefaults/Fulcrum.ServiceDefaults.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Fulcrum.Auth.Tests/Fulcrum.Auth.Tests.csproj" />
+  </Folder>
 </Solution>

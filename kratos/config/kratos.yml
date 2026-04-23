@@ -1,0 +1,114 @@
+version: v1.0.0
+
+dsn: replace-me
+
+serve:
+  public:
+    base_url: http://localhost:4433/
+    cors:
+      enabled: true
+      allowed_origins:
+        - http://localhost:3000
+        - http://localhost:5100
+      allowed_methods:
+        - POST
+        - GET
+        - PUT
+        - PATCH
+        - DELETE
+      allowed_headers:
+        - Authorization
+        - Cookie
+        - Content-Type
+  admin:
+    base_url: http://localhost:4434/
+
+selfservice:
+  default_browser_return_url: http://localhost:3000/
+  methods:
+    password:
+      enabled: true
+      config:
+        min_password_length: 8
+        haveibeenpwned_enabled: true
+        identifier_similarity_check_enabled: true
+    totp:
+      enabled: false
+    webauthn:
+      enabled: false
+    oidc:
+      enabled: false
+    lookup_secret:
+      enabled: false
+  flows:
+    error:
+      ui_url: http://localhost:3000/error
+    settings:
+      ui_url: http://localhost:3000/settings
+      privileged_session_max_age: 15m
+      after:
+        hooks:
+          - hook: webhook
+            config:
+              url: http://api:5100/api/auth/webhooks/after-settings
+              method: POST
+              headers:
+                X-Kratos-Webhook-Secret: ${WEBHOOK_SECRET}
+              body: file:///etc/config/kratos/webhook.settings.body.jsonnet
+    recovery:
+      enabled: true
+      ui_url: http://localhost:3000/recovery
+      use: code
+    verification:
+      enabled: true
+      ui_url: http://localhost:3000/verify
+      use: code
+    logout:
+      after:
+        default_browser_return_url: http://localhost:3000/login
+    login:
+      ui_url: http://localhost:3000/login
+      lifespan: 10m
+    registration:
+      ui_url: http://localhost:3000/register
+      lifespan: 10m
+      after:
+        password:
+          hooks:
+            - hook: show_verification_ui
+            - hook: webhook
+              config:
+                url: http://api:5100/api/auth/webhooks/after-registration
+                method: POST
+                headers:
+                  X-Kratos-Webhook-Secret: ${WEBHOOK_SECRET}
+                body: file:///etc/config/kratos/webhook.registration.body.jsonnet
+
+log:
+  level: debug
+  format: text
+  leak_sensitive_values: true
+
+secrets:
+  cookie:
+    - dev-only-secret-change-in-production
+  cipher:
+    - dev-only-cipher-secret-123456789
+
+hashers:
+  algorithm: bcrypt
+  bcrypt:
+    cost: 8
+
+identity:
+  default_schema_id: default
+  schemas:
+    - id: default
+      url: file:///etc/config/kratos/identity.schema.json
+
+courier:
+  delivery_strategy: http
+  http:
+    request_config:
+      url: http://localhost:5100/api/auth/courier
+      method: POST
