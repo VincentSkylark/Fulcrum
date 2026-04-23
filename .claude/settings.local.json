@@ -16,7 +16,10 @@
       "mcp__context7__resolve-library-id",
       "WebSearch",
       "mcp__web-reader__webReader",
-      "mcp__roslyn__get_diagnostics"
+      "mcp__roslyn__get_diagnostics",
+      "mcp__roslyn__find_symbol",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_run_code"
     ],
     "deny": []
   },
