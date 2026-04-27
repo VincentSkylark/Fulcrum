@@ -66,7 +66,7 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 ## Phase 2: Authentication
 
 - **Goal:** User identity, sessions, social login, and GDPR foundations
-- **Status:** In Progress (AUTH-01 to AUTH-04 complete)
+- **Status:** Backend Complete (AUTH-01 to AUTH-04 done; AUTH-05 to AUTH-08 deferred)
 - **Requirements:**
   - AUTH-01: Kratos configuration + identity schema
   - AUTH-02: Session middleware + CurrentUser context
@@ -87,7 +87,7 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 ## Phase 3: AI Orchestration (LLM Graph Engine)
 
 - **Goal:** Add a lightweight graph-based state machine to `Fulcrum.Core` for orchestrating LLM calls and multi-step AI workflows — a lite LangGraph
-- **Status:** Not Started
+- **Status:** Completed (2026-04-27)
 - **Requirements:**
   - LLM-01: Core abstractions — `INode`, `IGraph`, `IState`, `IEdge` interfaces in `Fulcrum.Core` (no external dependencies)
   - LLM-02: Node types — `INode` is the single node interface (implement directly for complex nodes like LLM calls); `TaskNode` convenience wrapper for simple `Func<State, CancellationToken, Task<State>>` logic; nodes that need LLM access inject `IChatProvider` directly — no dedicated `LlmNode` abstraction needed

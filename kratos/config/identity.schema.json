@@ -32,10 +32,7 @@
           "title": "Username",
           "minLength": 3,
           "maxLength": 30,
-          "not": {
-    "enum": ["admin", "root", "support", "billing", "api", "null"]
-  },
-          "pattern": "^[a-zA-Z0-9_-]+$",
+          "pattern": "^(?!admin$|root$|support$|billing$|api$|null$)[a-zA-Z0-9_-]+$",
           "ory.sh/kratos": {
             "credentials": {
               "password": {
