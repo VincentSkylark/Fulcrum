@@ -61,5 +61,3 @@ For your other modules, follow this same pattern but swap the specifics:
 1.  **Fulcrum.Auth:** Focus on the **Kratos Webhook** handling and **Identity Mapping**.
 2.  **Fulcrum.Recommendations:** Focus on the **Vector Search logic** and how it weights "Vantage" (diversity) vs. "Similarity."
 3.  **Fulcrum.Notifications:** Focus on the **Provider Abstraction** (FCM, SendGrid) and **Rate Limiting**.
-
-Does this level of detail feel right for your current workflow, or should we add a section for **Frontend Requirements** as well?

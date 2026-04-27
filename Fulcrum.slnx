@@ -14,5 +14,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Fulcrum.Auth.Tests/Fulcrum.Auth.Tests.csproj" />
+    <Project Path="tests/Fulcrum.Core.Tests/Fulcrum.Core.Tests.csproj" />
   </Folder>
 </Solution>

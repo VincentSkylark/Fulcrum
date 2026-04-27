@@ -19,7 +19,10 @@
       "mcp__roslyn__get_diagnostics",
       "mcp__roslyn__find_symbol",
       "mcp__playwright__browser_navigate",
-      "mcp__playwright__browser_run_code"
+      "mcp__playwright__browser_run_code",
+      "mcp__cwm-roslyn-navigator__find_symbol",
+      "mcp__cwm-roslyn-navigator__find_references",
+      "mcp__web-search-prime__web_search_prime"
     ],
     "deny": []
   },

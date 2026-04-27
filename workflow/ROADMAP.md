@@ -84,7 +84,34 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 
 ---
 
-## Phase 3: Core Domain — News Ingestion
+## Phase 3: AI Orchestration (LLM Graph Engine)
+
+- **Goal:** Add a lightweight graph-based state machine to `Fulcrum.Core` for orchestrating LLM calls and multi-step AI workflows — a lite LangGraph
+- **Status:** Not Started
+- **Requirements:**
+  - LLM-01: Core abstractions — `INode`, `IGraph`, `IState`, `IEdge` interfaces in `Fulcrum.Core` (no external dependencies)
+  - LLM-02: Node types — `INode` is the single node interface (implement directly for complex nodes like LLM calls); `TaskNode` convenience wrapper for simple `Func<State, CancellationToken, Task<State>>` logic; nodes that need LLM access inject `IChatProvider` directly — no dedicated `LlmNode` abstraction needed
+  - LLM-03: Graph builder — fluent API for wiring nodes together with edges and defining entry/exit points
+  - LLM-04: State management — typed state record that flows through the graph; nodes read input state and return state updates
+  - LLM-05: Conditional router — `IRouter` node that inspects state and selects the next node; supports binary outcomes (success/fail), multi-way classification (route to N nodes based on LLM output), and default fallback; replaces predicate-decorated edges with an explicit routing node
+  - LLM-06: LLM provider abstraction — `IChatProvider` interface in Core with concrete implementations in consuming modules (Claude, OpenAI, local models)
+  - LLM-07: Graph execution engine — runs the graph to completion with two-tier cycle protection: hard limit on total transitions (e.g., 50) and soft limit on consecutive visits to the same node (e.g., 3 revisits to `LlmNode_Refine` triggers a tight-loop exit); execution context carries a turn counter and per-node visit log; propagates `CancellationToken`
+  - LLM-08: Observability — `ActivitySource`-based OpenTelemetry spans; graph execution is one parent `Activity`, each `INode.ExecuteAsync` gets a sub-span with node name, duration, and outcome; nodes that call LLMs can tag provider-specific metadata (model, token usage) on their span; this gives execution timing and traceability for free in Aspire Dashboard and Jaeger without custom logging logic
+  - LLM-09: Streaming support — `IStreamingChatProvider` for partial LLM responses that flow through the graph
+- **Design Principles:**
+  - Core has zero external dependencies — provider implementations live in consuming modules
+  - Nodes are the unit of composition — implement `INode` directly for any work (LLM calls, tool invocations, conditional branches, plain code); `TaskNode` is a convenience wrapper for simple cases
+  - Graphs own the wiring; nodes own the work
+  - State is immutable between transitions (each node returns a new state snapshot)
+  - No checkpointing or persistence in v1 — keep it lite, add when a module needs it
+- **Downstream Consumers:**
+  - Phase 4 (News) — NEWS-06 AI categorization, NEWS-05 similarity detection
+  - Phase 5 (Personalization) — REC-03 embedding generation, REC-04 recommendation scoring
+- **Tasks:** TBD
+
+---
+
+## Phase 4: Core Domain — News Ingestion
 
 - **Goal:** End-to-end news pipeline from source to searchable storage
 - **Status:** Not Started
@@ -102,7 +129,7 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 
 ---
 
-## Phase 4: Personalization
+## Phase 5: Personalization
 
 - **Goal:** AI-powered recommendations and personalized feeds
 - **Status:** Not Started
@@ -117,7 +144,7 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 
 ---
 
-## Phase 5: Payment
+## Phase 6: Payment
 
 - **Goal:** Monetization through subscriptions with Stripe
 - **Status:** Not Started
@@ -132,7 +159,7 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 
 ---
 
-## Phase 6: Push Delivery
+## Phase 7: Push Delivery
 
 - **Goal:** Multi-channel notification delivery and tracking
 - **Status:** Not Started
@@ -147,7 +174,7 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 
 ---
 
-## Phase 7: Admin
+## Phase 8: Admin
 
 - **Goal:** Administrative tools for content and user management
 - **Status:** Not Started
@@ -161,7 +188,7 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 
 ---
 
-## Phase 8: API + Performance
+## Phase 9: API + Performance
 
 - **Goal:** Production-grade API hardening and performance optimization
 - **Status:** Not Started
@@ -175,7 +202,7 @@ minio:           # S3-compatible local object storage (Phase 3 — News)
 
 ---
 
-## Phase 9: Production
+## Phase 10: Production
 
 - **Goal:** Production deployment, monitoring, compliance, and localization
 - **Status:** Not Started
