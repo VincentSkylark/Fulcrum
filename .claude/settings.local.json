@@ -22,7 +22,9 @@
       "mcp__playwright__browser_run_code",
       "mcp__cwm-roslyn-navigator__find_symbol",
       "mcp__cwm-roslyn-navigator__find_references",
-      "mcp__web-search-prime__web_search_prime"
+      "mcp__web-search-prime__web_search_prime",
+      "mcp__roslyn__get_type_hierarchy",
+      "mcp__roslyn__get_public_api"
     ],
     "deny": []
   },
