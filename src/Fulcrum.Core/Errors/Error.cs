@@ -16,6 +16,9 @@ public sealed record Error(ErrorType Type, string Code, string Message)
     public static Error Unauthorized(string code, string message) =>
         new(ErrorType.Unauthorized, code, message);
 
+    public static Error Unavailable(string code, string message) =>
+        new(ErrorType.Unavailable, code, message);
+
     public static Error Unexpected(string code, string message) =>
         new(ErrorType.Unexpected, code, message);
 }
