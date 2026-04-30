@@ -3,6 +3,7 @@ using Fulcrum.API.Endpoints;
 using Fulcrum.API.Handlers;
 using Fulcrum.Auth;
 using Fulcrum.Core.Events;
+using Fulcrum.News;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Wolverine;
@@ -24,6 +25,7 @@ try
     builder.Host.UseWolverine();
 
     builder.Services.AddFulcrumAuth(builder.Configuration);
+    builder.Services.AddFulcrumNews(builder.Configuration);
 
     builder.Services.AddDbContext<AppDbContext>((sp, options) =>
     {
