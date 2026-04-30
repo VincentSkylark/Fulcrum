@@ -31,11 +31,11 @@ public sealed class GNewsClient : INewsProviderClient
             request.Language, request.Country, request.Max,
             request.Page, request.ExpandContent, request.NullableFields);
 
-        if (request.Category is not null)
+        if (!string.IsNullOrWhiteSpace(request.Category))
             queryParams["category"] = request.Category;
-        if (request.SearchIn is not null)
+        if (!string.IsNullOrWhiteSpace(request.SearchIn))
             queryParams["in"] = request.SearchIn;
-        if (request.SortBy is not null)
+        if (!string.IsNullOrWhiteSpace(request.SortBy))
             queryParams["sortby"] = request.SortBy;
         if (request.From is not null)
             queryParams["from"] = FormatDateTime(request.From.Value);
@@ -53,9 +53,9 @@ public sealed class GNewsClient : INewsProviderClient
             request.Page, request.ExpandContent, request.NullableFields);
 
         queryParams["q"] = request.Query;
-        if (request.SearchIn is not null)
+        if (!string.IsNullOrWhiteSpace(request.SearchIn))
             queryParams["in"] = request.SearchIn;
-        if (request.SortBy is not null)
+        if (!string.IsNullOrWhiteSpace(request.SortBy))
             queryParams["sortby"] = request.SortBy;
         if (request.From is not null)
             queryParams["from"] = FormatDateTime(request.From.Value);
@@ -92,9 +92,9 @@ public sealed class GNewsClient : INewsProviderClient
     {
         var parameters = new Dictionary<string, string>();
 
-        if (language is not null)
+        if (!string.IsNullOrWhiteSpace(language))
             parameters["lang"] = language;
-        if (country is not null)
+        if (!string.IsNullOrWhiteSpace(country))
             parameters["country"] = country;
         if (max is not null)
             parameters["max"] = max.Value.ToString();
@@ -102,7 +102,7 @@ public sealed class GNewsClient : INewsProviderClient
             parameters["page"] = page.Value.ToString();
         if (expandContent)
             parameters["expand"] = "content";
-        if (nullableFields is not null)
+        if (!string.IsNullOrWhiteSpace(nullableFields))
             parameters["nullable"] = nullableFields;
 
         return parameters;
