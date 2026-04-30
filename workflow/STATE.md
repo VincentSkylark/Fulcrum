@@ -2,9 +2,9 @@
 
 ## Current Position
 
-- **Active Phase:** Phase 4: News Ingestion (Not Started)
+- **Active Phase:** Phase 4: News Ingestion (In Progress)
 - **Last Completed:** Phase 3: Core Abstractions + AI Orchestration (2026-04-27)
-- **Date:** 2026-04-27
+- **Date:** 2026-04-29
 
 ## Completed Work
 
@@ -42,6 +42,14 @@
   - IRouter<TState>, Graph<TState>, GraphBuilder<TState>
   - GraphExecutor with cycle protection + OpenTelemetry spans
   - GraphExecutionException
+
+### Phase 4: News Ingestion — GNews SDK (2026-04-29)
+
+- Unavailable error type added to Fulcrum.Core (ErrorType enum + Error.Unavailable factory)
+- Provider-neutral contracts: INewsProviderClient interface, TopHeadlinesRequest, SearchRequest, NewsProviderResponse, NewsProviderArticle, NewsProviderSource records
+- GNews SDK: GNewsClient (INewsProviderClient impl), GNewsOptions, GNewsErrorMapper
+- IHttpClientFactory registration, IOptions<GNewsOptions> configuration
+- DI wired via AddFulcrumNews() in Program.cs, GNews config section in appsettings.json
 
 ## Remaining Auth Work (deferred, can run in parallel)
 

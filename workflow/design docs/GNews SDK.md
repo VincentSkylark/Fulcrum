@@ -44,8 +44,12 @@ GET /top-headlines
 | `country`   | string | no       | ISO 3166-1 alpha-2 (e.g., `us`, `gb`, `de`)    |
 | `max`       | int    | no       | 1–10 (default 10)                               |
 | `page`      | int    | no       | Page number for pagination                      |
+| `in`        | string | no       | `title`, `description`, `content` (comma-sep)   |
 | `expand`    | string | no       | `content` to get full content field             |
 | `nullable`  | string | no       | `title`, `description`, `content`, etc.         |
+| `sortby`    | string | no       | `relevance`, `date`, `publish-time`             |
+| `from`      | string | no       | ISO 8601 datetime (e.g., `2026-04-20T00:00:00Z`) |
+| `to`        | string | no       | ISO 8601 datetime                               |
 
 #### Search
 ```
@@ -62,6 +66,7 @@ GET /search
 | `in`        | string | no       | `title`, `description`, `content` (comma-sep)   |
 | `expand`    | string | no       | `content` to get full content field             |
 | `nullable`  | string | no       | Include articles with missing fields            |
+| `sortby`    | string | no       | `relevance`, `date`, `publish-time`             |
 | `from`      | string | no       | ISO 8601 datetime (e.g., `2026-04-20T00:00:00Z`) |
 | `to`        | string | no       | ISO 8601 datetime                               |
 
@@ -194,6 +199,14 @@ GNews often returns the same article from multiple sources. The SDK does **not**
 
 Starting on the free tier (100 req/day, 10 articles/request, 12-hour delay, no full content). The SDK is designed so upgrading to Essential requires only a config change (new API key) — no code changes.
 
+### 10. Timeout — configurable via options (resolved)
+
+The official TS SDK exposes `maxWait` (default 10,000ms) as a per-client-instance option. We expose `Timeout` on `GNewsOptions` (default 30s) so callers can tune it via `appsettings.json` without code changes. The value is applied in the `AddHttpClient` DI registration.
+
+### 11. `GNewsErrorMapper` — static helper class (resolved)
+
+`GNewsErrorMapper` is an `internal static` class with a single `MapError(HttpResponseMessage)` method. It is **not** injected — the `GNewsClient` calls it directly as `GNewsErrorMapper.MapError(response)`. The separate file exists for readability (the mapping table is non-trivial), not for DI isolation. The client sketch above calls `MapError(response)` as shorthand for the full qualified call.
+
 ### GNews Free Tier Constraints (reference)
 
 | Feature | Free | Essential (€50/mo) | Business (€100/mo) |
@@ -234,8 +247,12 @@ public sealed record TopHeadlinesRequest(
     string? Country = null,
     int? Max = null,
     int? Page = null,
+    string? SearchIn = null,            // e.g., "title,description,content"
     bool ExpandContent = false,
-    string? NullableFields = null);     // e.g., "title,description"
+    string? NullableFields = null,      // e.g., "title,description"
+    string? SortBy = null,              // "relevance", "date", "publish-time"
+    DateTimeOffset? From = null,
+    DateTimeOffset? To = null);
 
 public sealed record SearchRequest(
     string Query,
@@ -246,6 +263,7 @@ public sealed record SearchRequest(
     string? SearchIn = null,            // e.g., "title,description,content"
     bool ExpandContent = false,
     string? NullableFields = null,      // e.g., "title,description"
+    string? SortBy = null,              // "relevance", "date", "publish-time"
     DateTimeOffset? From = null,
     DateTimeOffset? To = null);
 
@@ -278,6 +296,7 @@ public sealed record GNewsOptions
 
     public string ApiKey { get; init; } = string.Empty;
     public string BaseUrl { get; init; } = "https://gnews.io/api/v4/";
+    public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(30);
 }
 ```
 
@@ -286,7 +305,8 @@ public sealed record GNewsOptions
 {
   "GNews": {
     "ApiKey": "your-api-key-here",
-    "BaseUrl": "https://gnews.io/api/v4/"
+    "BaseUrl": "https://gnews.io/api/v4/",
+    "Timeout": "00:00:30"
   }
 }
 ```
@@ -315,6 +335,14 @@ public sealed class GNewsClient : INewsProviderClient
 
         if (request.Category is not null)
             queryParams["category"] = request.Category;
+        if (request.SearchIn is not null)
+            queryParams["in"] = request.SearchIn;
+        if (request.SortBy is not null)
+            queryParams["sortby"] = request.SortBy;
+        if (request.From is not null)
+            queryParams["from"] = request.From.Value.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
+        if (request.To is not null)
+            queryParams["to"] = request.To.Value.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
         return await SendAsync("top-headlines", queryParams, ct);
     }
@@ -328,7 +356,7 @@ public sealed class GNewsClient : INewsProviderClient
 
         queryParams["q"] = request.Query;
         if (request.SearchIn is not null) queryParams["in"] = request.SearchIn;
-        if (request.NullableFields is not null) queryParams["nullable"] = request.NullableFields;
+        if (request.SortBy is not null) queryParams["sortby"] = request.SortBy;
         if (request.From is not null) queryParams["from"] = request.From.Value.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
         if (request.To is not null) queryParams["to"] = request.To.Value.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
@@ -371,8 +399,9 @@ public static IServiceCollection AddFulcrumNews(this IServiceCollection services
 
     services.AddHttpClient<INewsProviderClient, GNewsClient>(client =>
     {
-        client.BaseAddress = new Uri("https://gnews.io/api/v4/");
-        client.Timeout = TimeSpan.FromSeconds(30);
+        var options = config.GetSection(GNewsOptions.SectionName).Get<GNewsOptions>() ?? new GNewsOptions();
+        client.BaseAddress = new Uri(options.BaseUrl);
+        client.Timeout = options.Timeout;
     });
 
     return services;

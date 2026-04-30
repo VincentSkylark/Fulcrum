@@ -118,6 +118,99 @@
         }
       ],
       "task_type": "backend"
+    },
+    {
+      "id": 6,
+      "title": "Add Unavailable error type to Fulcrum.Core",
+      "description": "Extend ErrorType enum with Unavailable and add Error.Unavailable() factory method for rate-limit/quota/network errors needed by GNews SDK.",
+      "status": "completed",
+      "depends_on": [],
+      "steps": [
+        "Add Unavailable to ErrorType enum in src/Fulcrum.Core/Errors/ErrorType.cs",
+        "Add Error.Unavailable(string code, string message) factory method in src/Fulcrum.Core/Errors/Error.cs",
+        "Run dotnet build to verify"
+      ],
+      "history": [
+        {
+          "status": "completed",
+          "commit": "e37251e",
+          "note": "Added Unavailable to ErrorType enum and Error.Unavailable() factory method. Build clean, 0 warnings.",
+          "date": "2026-04-29 21:33"
+        }
+      ],
+      "task_type": "backend"
+    },
+    {
+      "id": 7,
+      "title": "Create provider-neutral contracts in Fulcrum.News",
+      "description": "Add INewsProviderClient interface and provider-neutral request/response records (TopHeadlinesRequest, SearchRequest, NewsProviderResponse, NewsProviderArticle, NewsProviderSource).",
+      "status": "completed",
+      "depends_on": [
+        6
+      ],
+      "steps": [
+        "Create src/Fulcrum.News/Clients/INewsProviderClient.cs with GetTopHeadlinesAsync and SearchAsync returning Result<NewsProviderResponse>",
+        "Create src/Fulcrum.News/Clients/NewsProviderContracts.cs with TopHeadlinesRequest, SearchRequest, NewsProviderResponse, NewsProviderArticle, NewsProviderSource records",
+        "Run dotnet build to verify"
+      ],
+      "history": [
+        {
+          "status": "completed",
+          "commit": "2a014b2",
+          "note": "Created INewsProviderClient interface and 5 provider-neutral records (TopHeadlinesRequest, SearchRequest, NewsProviderResponse, NewsProviderArticle, NewsProviderSource). Build clean.",
+          "date": "2026-04-29 21:34"
+        }
+      ],
+      "task_type": "backend"
+    },
+    {
+      "id": 8,
+      "title": "Implement GNews client",
+      "description": "Build GNewsClient (INewsProviderClient impl), GNewsOptions (config), GNewsErrorMapper (HTTP status to Error mapping), and internal JSON deserialization types.",
+      "status": "completed",
+      "depends_on": [
+        7
+      ],
+      "steps": [
+        "Create src/Fulcrum.News/Clients/GNews/GNewsOptions.cs with ApiKey, BaseUrl, Timeout, SectionName",
+        "Create src/Fulcrum.News/Clients/GNews/GNewsErrorMapper.cs as internal static class mapping GNews HTTP errors (400, 401, 403, 429) to Result errors using Error.Unavailable/Validation/Unauthorized/Unexpected",
+        "Create src/Fulcrum.News/Clients/GNews/GNewsClient.cs implementing INewsProviderClient with HttpClient, query param building via QueryHelpers, JSON deserialization via System.Text.Json, provider-neutral response mapping",
+        "Add Microsoft.AspNetCore.WebUtilities package to Fulcrum.News for QueryHelpers.AddQueryString",
+        "Run dotnet build to verify"
+      ],
+      "history": [
+        {
+          "status": "completed",
+          "commit": "84d1ef6",
+          "note": "GNewsClient, GNewsOptions, GNewsErrorMapper implemented. Uses IHttpClientFactory, QueryHelpers, System.Text.Json. Added Microsoft.AspNetCore.WebUtilities + Microsoft.Extensions.Options packages. Build clean.",
+          "date": "2026-04-29 21:37"
+        }
+      ],
+      "task_type": "backend"
+    },
+    {
+      "id": 9,
+      "title": "Wire DI registration and verify build",
+      "description": "Add AddFulcrumNews() extension method, register GNewsClient via IHttpClientFactory, wire in Fulcrum.API Program.cs, add config to appsettings.json.",
+      "status": "completed",
+      "depends_on": [
+        8
+      ],
+      "steps": [
+        "Create src/Fulcrum.News/ServiceCollectionExtensions.cs with AddFulcrumNews() that configures GNewsOptions from IConfiguration, registers HttpClient<INewsProviderClient, GNewsClient>",
+        "Update src/Fulcrum.API/Program.cs to call builder.Services.AddFulcrumNews(builder.Configuration)",
+        "Add GNews config section to src/Fulcrum.API/appsettings.json with ApiKey placeholder, BaseUrl, Timeout",
+        "Run dotnet build to verify full solution builds clean"
+      ],
+      "history": [
+        {
+          "status": "completed",
+          "commit": "0e7c74d",
+          "note": "AddFulcrumNews() extension with IHttpClientFactory registration. Wired in Program.cs. GNews config section in appsettings.json. Full solution build clean, 0 warnings.",
+          "date": "2026-04-29 21:40"
+        }
+      ],
+      "task_type": "backend"
     }
   ]
 }
