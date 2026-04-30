@@ -48,7 +48,7 @@ selfservice:
       privileged_session_max_age: 15m
       after:
         hooks:
-          - hook: webhook
+          - hook: web_hook
             config:
               url: http://api:5100/api/auth/webhooks/after-settings
               method: POST
@@ -76,7 +76,7 @@ selfservice:
         password:
           hooks:
             - hook: show_verification_ui
-            - hook: webhook
+            - hook: web_hook
               config:
                 url: http://api:5100/api/auth/webhooks/after-registration
                 method: POST
